@@ -1,0 +1,8 @@
+bilibili-api-python>=16.0
+yt-dlp>=2024.0
+openai-whisper>=20231117
+jieba>=0.42
+tqdm>=4.64
+requests>=2.28
+scikit-learn>=1.2
+sentence-transformers>=2.2
