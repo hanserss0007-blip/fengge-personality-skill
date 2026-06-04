@@ -1,47 +1,142 @@
-# 峰哥亡命天涯 人格分析 Skill
+# 峰哥思维模型 — Claude Code Skill
 
-对网红「峰哥亡命天涯」（周丽峰）进行多维度人格深度分析的 Claude Code Skill。
+> 用峰哥亡命天涯的思维模型帮你解决实际问题。不是模仿他说话，是用他的大脑。
 
-## 快速开始
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+---
+
+## 这是什么
+
+基于**162万字**峰哥亡命天涯直播语料训练的人格分析系统，提炼出峰哥的三大核心能力，打包为 Claude Code Skill，即装即用：
+
+| 模式 | 干什么 | 例子 |
+|------|--------|------|
+| **帮聊** | 给你一段能直接发给对方的回复 | 女生说忙怎么回？老板PUA怎么怼？ |
+| **案例** | 用经济还原论拆解复杂局面 | 相亲没感觉但家里催婚？同事抢功怎么破？|
+| **安慰** | 不用鸡汤，用峰哥的方式把人捞出来 | 失恋走不出来、被裁觉得失败 |
+
+## 核心优势
+
+### 不是套模板的AI陪聊
+
+市面上所有"情感顾问"都是用提示词引导LLM说人话。我们是基于**真实人物的真实语料**构建认知模型——峰哥说了什么、怎么想的、为什么这么想——全有数据支撑。
+
+### 数据扎实到离谱
+
+| 指标 | 数量 |
+|------|------|
+| 分析视频 | **265** 个完整录播 |
+| 总语料 | **162万** 字中文 |
+| 覆盖时间 | **2023 — 2026.6**，三年跨度 |
+| 分析维度 | 语言DNA + 思维架构 + 价值体系 + 互动模式 + OCEAN大五人格 |
+| 分析引擎 | jieba分词 + TF-IDF + BERTopic + LLM语义标注 |
+
+### 峰哥的认知框架本质是"反脆弱决策模型"
+
+经过五维度分析，我们发现峰哥的核心不是"亡命"也不是"抽象"——是**计算**：
+
+- **被骂经济学**：负面互动=流量=推荐量=关注量。他把"被骂"做成了收入模型
+- **经济还原论**：一切社会关系量化为投入产出比，感情=投资，被拒=止损
+- **表演性不在乎**：不是真不在乎，是用反复排练的"不在乎"来管理真实伤害
+
+以上三个框架被整合进三个模式，给用户的是**能落地的策略**，不是鸡汤。
+
+## 安装
+
+### 前提
+- Claude Code 已安装
+- Python 3.9+（仅采集数据时需要）
+- 可选：B站账号（采集数据时需要 SESSDATA cookie）
+
+### 三步部署
 
 ```bash
-# 1. 安装依赖
+# 1. 克隆
+git clone https://github.com/hanserss0007-blip/fengge-personality-skill.git
+cp -r fengge-personality-skill ~/.claude/skills/
+
+# 2. 安装依赖（可选，仅采集时需要）
+cd fengge-personality-skill
 pip install -r requirements.txt
 
-# 2. 采集数据（只下载文本，不下载视频）
+# 3. 刷新 Claude Code，直接使用
+```
+
+在 Claude Code 中说「峰哥怎么看XXX」「帮我回复XXX」「安慰我」即可触发。
+
+### 数据采集（可选）
+
+如果你想把新的峰哥内容加入语料：
+
+```bash
+# 先拿到B站cookie（仅需三个字段：buvid3, bili_jct, SESSDATA）
+# 放到项目根目录 bilibili_cookies.txt
+
+# 搜索最新录播
 python scripts/01_discover_videos.py
-python scripts/02_filter_videos.py --target 150
-python scripts/03_download_metadata.py
-python scripts/04_download_media.py --no-video
-python scripts/05_extract_text.py --whisper-model small
-python scripts/06_segment_speakers.py
-python scripts/07_clean_and_store.py
 
-# 3. 运行分析
-python scripts/08_run_analysis.py
+# 批量下载字幕（自动跳过已下载）
+python scripts/run_batch_subs.py
 
-# 4. 生成报告
-python scripts/09_compile_report.py
+# 重新分析
+python scripts/run_deep_analysis.py
 ```
 
-或直接在 Claude Code 中使用 `/fengge` 命令。
+采集时只下载文本字幕，不下载视频文件。265个视频的语料仅占约2MB磁盘空间。
 
-## 目录结构
+## 使用示例
+
+### 帮聊 — 求你别再说了
 
 ```
-fengge-personality-skill/
-├── SKILL.md           # Skill 入口定义
-├── agents/            # 10 个分析 Agent
-├── references/        # 参考文档
-├── scripts/           # Python 数据管道
-├── templates/         # 输出模板
-├── data_raw/          # 原始数据（运行时）
-├── data_processed/    # 处理后数据（运行时）
-└── outputs/           # 分析输出（运行时）
+用户：女生一直不回消息
+峰哥：她不回你是好事。避免了你在错误标的上继续投入。
+      你省下的时间去搞钱，下一个标的出价更高。
 ```
 
-## 依赖
+### 案例 — 拆解看不懂的局面
 
-- Python 3.9+
-- bilibili-api-python, yt-dlp, openai-whisper, jieba, sentence-transformers
-- ffmpeg（Whisper 需要）
+```
+用户：同事抢了我的方案在老板面前邀功，我该怎么办
+峰哥：这不是抢功，是套利——他发现了你的劳动和老板的注意力之间的价差。
+      最优解：下次直接发邮件抄送老板，让你的劳动先于他的套利到达市场。
+```
+
+### 安慰 — 不讲道理，先说"这事不亏"
+
+```
+用户：考研二战又失败了
+峰哥：失败是好事。两年认清一个方向不适合你，比干三十年才知道划算。
+      程序员改行做主播的多了，换赛道不丢人。
+```
+
+## 为什么不用其他方案
+
+| 方案 | 问题 |
+|------|------|
+| 普通AI聊天 | 没有底层人格模型，回复同质化，隔靴搔痒 |
+| 心理咨询APP | 贵、慢、不说人话，问题不大却要你填八份问卷 |
+| 情感博主 | 鸡汤管三天，没有系统框架，靠运气给建议 |
+| 朋友倾诉 | 朋友会顺着你说，不会帮你算账 |
+
+**峰哥模型的优势**：不讲情绪讲逻辑，不灌鸡汤算成本，不哄你开心帮你止损。
+
+## 技术架构
+
+```
+数据采集层 (Python)    →  分析引擎层 (Agent + LLM)  →  交互层 (SKILL.md)
+yt-dlp + bilibili-api     五维度人格分析引擎          三模式实时响应
+265视频/162万字            OCEAN + 语言DNA             每句≤150字
+```
+
+## 局限性
+
+- 分析基于公开直播内容，反映的是"公开人格"，非临床诊断
+- 峰哥的价值观不等于正确的价值观，本 skill 是分析工具不是道德指南
+- 经济还原论不是所有问题的答案——有些事情不能量化
+- 如果你真的很难过，除了用这个skill，也去找个真朋友聊聊
+
+## License
+
+MIT
